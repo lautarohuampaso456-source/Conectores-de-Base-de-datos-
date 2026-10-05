@@ -1,0 +1,284 @@
+Manual instructor
+lo que se necesitas es :
+Node.js, Express, SQLite3, HTML5 y JavaScript (Fetch API)
+Proyecto: Gestión de Datos mediante Formulario Web
+1. Introducción y Arquitectura del Sistema
+
+  [ CLIENTE / BROWSER ]
+   1.registrar (Envía datos del formulario)----> 2.[ SERVIDOR NODE.JS ]---> 3.[ BASE DE DATOS ]
+   3. Muestra tabla actualizada                        (Express.js)      (SQLite: base_de_datos.db)
+   
+
+2. Estructura del Proyecto
+Crea una carpeta para tu proyecto y organiza los archivos de la siguiente manera:
+EJ:
+-carpeta principal (server (SI))
+ Dentro de la carpeta:
+
+  _carpeta (node_modules)   se crea automáticamente al escrir en VisualStudio el comando npm install
+
+  _carpeta (public)  
+   Dentro de la carpeta public : El archivó (index.html)   El Formulario
+
+  _ la base de datos (base_de_datos.db)   Base de datos SQLite
+
+  _Archivo (package.json)   Las Configuraciónes
+
+  _Archivó (packpage-lock)   Se crea automáticamente al escribir el comando npm install en el archivo backpage.js
+
+  _Archivo (server.js)   El Servidor backend en Node.js
+
+3. Paso a Paso: Implementación del Backend (server.js)
+
+3.1: Abre la terminal en la carpeta de tu proyecto y ejecuta los siguientes comandos:
+_ Inicializar package.json
+_ comando necesario: npm init -y
+
+_ Instalar Express (Servidor Web) y SQLite3 (Base de datos)
+_ comando necesario: npm install express sqlite3
+
+_agregar si o si el script de inicio dentro de tu archivo package.json:
+
+"scripts": {
+  "start": "node server.js"
+}
+
+3.2 Escribir el código del servidor (server.js)
+en el archivo server.js crear la tabla, insertar registros y consultar información:
+código con su explicación al lado 
+
+const express = require('express');
+const sqlite3 = require('sqlite3').verbose();
+const path = require('path');
+
+const app = express();
+const PORT = 3000;
+
+const db = new sqlite3.Database('./base.db', (err) => {    // Conexión a la base de datos (se crea el archivo 'base.db' si no existe) //
+
+    if (err) {
+        console.error('Error al conectar con SQLite:', err.message);   // El mensaje al no conectarse //
+    } else {
+        console.log('Conectado exitosamente a la base de datos SQLite.');
+    }
+});
+
+// Middlewares para procesar datos
+app.use(express.json()); // Permite recibir JSON desde el frontend
+app.use(express.urlencoded({ extended: true })); // Permite recibir formularios tradicionales
+app.use(express.static(path.join(__dirname, 'public'))); // Sirve el index.html
+
+
+db.run(`
+    CREATE TABLE IF NOT EXISTS usuarios (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nombre TEXT NOT NULL,
+        apellido TEXT NOT NULL,
+        edad INTEGER CHECK(edad >= 12),
+        email TEXT UNIQUE NOT NULL,
+        telefono TEXT,
+        dni TEXT UNIQUE NOT NULL
+    )
+`, (err) => {
+    if (err) {
+        console.error("Error al crear la tabla:", err.message);
+    } else {
+        console.log("Tabla 'usuarios' verificada/lista.");
+    }
+});
+
+app.get('/usuarios', (req, res) => {
+    const sql = 'SELECT * FROM usuarios';
+    
+    db.all(sql, [], (err, rows) => {
+        if (err) {
+            console.error("Error al consultar datos:", err.message);
+            return res.status(500).json({ error: 'Error al consultar la base de datos.' });
+        }
+        // Devuelve la lista de usuarios en formato JSON
+        res.json(rows);
+    });
+});
+
+app.post('/registrar', (req, res) => {
+    const { nombre, apellido, edad, email, telefono, dni } = req.body;
+
+    const sql = `
+        INSERT INTO usuarios (nombre, apellido, edad, email, telefono, dni) 
+        VALUES (?, ?, ?, ?, ?, ?)
+    `;
+    const params = [nombre, apellido, edad ? Number(edad) : null, email, telefono, dni];
+
+    db.run(sql, params, function (err) {
+        if (err) {
+            console.error("Error al insertar:", err.message);
+
+            // Manejo de restricciones únicas (Email o DNI duplicados)
+            if (err.message.includes('UNIQUE constraint failed')) {
+                return res.status(400).json({ error: 'El Email o DNI ya está registrado.' });
+            }
+            // Manejo de restricción CHECK (Edad menor a 12)
+            if (err.message.includes('CHECK constraint failed')) {
+                return res.status(400).json({ error: 'La edad debe ser mayor o igual a 12 años.' });
+            }
+
+            return res.status(500).json({ error: 'Error interno al guardar en la base de datos.' });
+        }
+
+        // Responde confirmando la inserción e indicando el ID generado
+        res.status(201).json({ 
+            mensaje: 'Usuario registrado exitosamente.', 
+            id: this.lastID 
+        });
+    });
+});
+
+// Iniciar servidor
+app.listen(PORT, () => {
+    console.log(`Servidor escuchando en http://localhost:${PORT}`);
+});
+
+4. Paso a Paso: Implementación del Frontend (public/index.html)
+Crea la carpeta public y guarda dentro el archivo index.html. Incluye el formulario para enviar datos mediante JavaScript (fetch) y una tabla para visualizar los registros sin necesidad de recargar la página:
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Usuarios - SQLite</title>
+    </head>
+<body>
+
+    <h2>Formulario de Registro (Insertar en BD)</h2>
+    <div id="mensaje" class="msg"></div>
+
+    <form id="registroForm">
+        <div>
+            <label>Nombre:</label>
+            <input type="text" name="nombre" required>
+        </div>
+        <div>
+            <label>Apellido:</label>
+            <input type="text" name="apellido" required>
+        </div>
+        <div>
+            <label>Edad:</label>
+            <input type="number" name="edad" min="12" required>
+        </div>
+        <div>
+            <label>Email:</label>
+            <input type="email" name="email" required>
+        </div>
+        <div>
+            <label>Teléfono:</label>
+            <input type="text" name="telefono">
+        </div>
+        <div>
+            <label>DNI:</label>
+            <input type="text" name="dni" required>
+        </div>
+        <button type="submit">Guardar Registro</button>
+    </form>
+
+    <h2>Usuarios Registrados (Extraer de BD)</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Edad</th>
+                <th>Email</th>
+                <th>DNI</th>
+            </tr>
+        </thead>
+        <tbody id="tablaUsuarios">
+            <!-- Los datos ingresados se cargarán aquí -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    const form = document.getElementById('registroForm');
+    const mensajeDiv = document.getElementById('mensaje');
+    const tablaUsuarios = document.getElementById('tablaUsuarios');
+
+       async function cargarUsuarios() {
+        try {
+            const res = await fetch('/usuarios');
+            const usuarios = await res.json();
+
+            tablaUsuarios.innerHTML = ''; // Limpia la tabla
+            usuarios.forEach(u => {
+                const fila = `
+                    <tr>
+                        <td>${u.id}</td>
+                        <td>${u.nombre}</td>
+                        <td>${u.apellido}</td>
+                        <td>${u.edad || '-'}</td>
+                        <td>${u.email}</td>
+                        <td>${u.dni}</td>
+                    </tr>
+                `;
+                tablaUsuarios.innerHTML += fila;
+            });
+        } catch (err) {
+            console.error('Error al cargar la lista:', err);
+        }
+    }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault(); // Evita recargar la página
+
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+
+        try {
+            const res = await fetch('/registrar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            const resultado = await res.json();
+
+            if (!res.ok) {
+                mostrarMensaje(resultado.error, true);
+            } else {
+                mostrarMensaje(resultado.mensaje, false);
+                form.reset(); // Limpia los campos del formulario
+                cargarUsuarios(); // Actualiza la tabla automáticamente
+            }
+        } catch (err) {
+            mostrarMensaje('Error de conexión con el servidor.', true);
+        }
+    });
+
+    function mostrarMensaje(texto, esError) {
+        mensajeDiv.innerText = texto;
+        mensajeDiv.className = `msg ${esError ? 'error' : 'success'}`;
+        mensajeDiv.style.display = 'block';
+    }
+
+
+
+
+
+        cargarUsuarios(); // carga el usuario//
+</script>
+
+</body>
+</html>
+
+5. Ejecución y Verificación
+ * Abre la consola en la carpeta de tu proyecto.
+ * Descarga las dependencias si aún no lo has hecho:
+   npm install
+
+ * Ejecuta el servidor:
+   npm start o node server.js
+
+ * Abre tu navegador web e ingresa a: http://localhost:3000
+Prueba de Funcionamiento:
+ * Agregar registros: Completa los campos en el formulario y pulsa Guardar Registro. La petición POST mandará los datos a Express, SQLite ejecutará el INSERT INTO y la tabla en pantalla se actualizará instantáneamente.
+ * Extraer registros: Al cargar la página o agregar un registro nuevo, la función JavaScript ejecuta un fetch('/usuarios'), solicitando un SELECT * FROM usuarios al servidor y dibujando cada fila en la tabla HTML.

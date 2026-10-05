@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro de Usuario</title>
+</head>
+<body>
+    <h2>Formulario de Registro</h2>
+    <form action="/registrar" method="POST">
+        <label>Nombre:</label><br>
+        <input type="text" name="nombre" required><br><br>
+
+        <label>Apellido:</label><br>
+        <input type="text" name="apellido" required><br><br>
+
+        <label>Edad:</label><br>
+        <input type="number" name="edad" min="0" required><br><br>
+
+        <label>Email:</label><br>
+        <input type="email" name="email" required><br><br>
+
+        <label>Teléfono:</label><br>
+        <input type="text" name="telefono"><br><br>
+
+        <label>DNI:</label><br>
+        <input type="text" name="dni" required><br><br>
+
+        <button type="submit">Guardar Registro</button>
+    </form>
+</body>
+</html>
