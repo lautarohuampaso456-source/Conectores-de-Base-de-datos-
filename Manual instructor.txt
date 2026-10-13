@@ -47,37 +47,36 @@ _agregar si o si el script de inicio dentro de tu archivo package.json:
 en el archivo server.js crear la tabla, insertar registros y consultar información:
 código con su explicación al lado 
 
-const express = require('express');
-const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
+const express = require('express');    // Importa el framework Express para manejar el servidor web
+const sqlite3 = require('sqlite3').verbose();     // Importa SQLite con mensajes detallados para la base de datos
+const path = require('path');    // Importa el módulo 'path' para trabajar con rutas de archivos
 
-const app = express();
-const PORT = 3000;
+const app = express();    // Inicializa la aplicación de Express
+const PORT = 3000;    // Define el puerto (3000) donde correrá el servidor
 
-const db = new sqlite3.Database('./base.db', (err) => {    // Conexión a la base de datos (se crea el archivo 'base.db' si no existe) //
+const db = new sqlite3.Database('./base.db', (err) => {    // Conexión a la base de datos (se crea el archivo 'base.db' si no existe)
 
     if (err) {
-        console.error('Error al conectar con SQLite:', err.message);   // El mensaje al no conectarse //
+        console.error('Error al conectar con SQLite:', err.message);   // El mensaje al no conectarse 
     } else {
-        console.log('Conectado exitosamente a la base de datos SQLite.');
+        console.log('Conectado exitosamente a la base de datos SQLite.');    // El mensaje al conectarse 
     }
 });
 
-// Middlewares para procesar datos
-app.use(express.json()); // Permite recibir JSON desde el frontend
-app.use(express.urlencoded({ extended: true })); // Permite recibir formularios tradicionales
-app.use(express.static(path.join(__dirname, 'public'))); // Sirve el index.html
+app.use(express.json());   // Permite que el servidor entienda datos en formato JSON desde el frontend
+app.use(express.urlencoded({ extended: true })); // Permite recibir formularios HTML tradicionales
+app.use(express.static(path.join(__dirname, 'public'))); // Configura una carpeta pública para servir el archivo index.html
 
 
 db.run(`
     CREATE TABLE IF NOT EXISTS usuarios (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nombre TEXT NOT NULL,
-        apellido TEXT NOT NULL,
-        edad INTEGER CHECK(edad >= 12),
-        email TEXT UNIQUE NOT NULL,
-        telefono TEXT,
-        dni TEXT UNIQUE NOT NULL
+        id INTEGER PRIMARY KEY AUTOINCREMENT,           // ID único autoincremental para cada usuario
+        nombre TEXT NOT NULL,                           // Nombre obligatorio
+        apellido TEXT NOT NULL,                         // Apellido obligatorio
+        edad INTEGER CHECK(edad >= 12),                 // Edad obligatoria que debe ser mayor o igual a 12
+        email TEXT UNIQUE NOT NULL,                     // Correo electrónico único y obligatorio
+        telefono TEXT,                                  // Teléfono opcional
+        dni TEXT UNIQUE NOT NULL                        // DNI único y obligatorio
     )
 `, (err) => {
     if (err) {
@@ -86,7 +85,7 @@ db.run(`
         console.log("Tabla 'usuarios' verificada/lista.");
     }
 });
-
+                          //OBTENER USUARIOS\\
 app.get('/usuarios', (req, res) => {
     const sql = 'SELECT * FROM usuarios';
     
@@ -95,13 +94,12 @@ app.get('/usuarios', (req, res) => {
             console.error("Error al consultar datos:", err.message);
             return res.status(500).json({ error: 'Error al consultar la base de datos.' });
         }
-        // Devuelve la lista de usuarios en formato JSON
-        res.json(rows);
+        res.json(rows);   // Devuelve la lista de usuarios en formato JSON
     });
 });
-
+                             //REGISTRAR USUARIO\\
 app.post('/registrar', (req, res) => {
-    const { nombre, apellido, edad, email, telefono, dni } = req.body;
+    const { nombre, apellido, edad, email, telefono, dni } = req.body;  // Extrae los datos enviados en el cuerpo de la petición
 
     const sql = `
         INSERT INTO usuarios (nombre, apellido, edad, email, telefono, dni) 
@@ -113,32 +111,28 @@ app.post('/registrar', (req, res) => {
         if (err) {
             console.error("Error al insertar:", err.message);
 
-            // Manejo de restricciones únicas (Email o DNI duplicados)
             if (err.message.includes('UNIQUE constraint failed')) {
-                return res.status(400).json({ error: 'El Email o DNI ya está registrado.' });
+                return res.status(400).json({ error: 'El Email o DNI ya está registrado.' });    // control de restricciones únicas (Email o DNI duplicados)
             }
-            // Manejo de restricción CHECK (Edad menor a 12)
             if (err.message.includes('CHECK constraint failed')) {
-                return res.status(400).json({ error: 'La edad debe ser mayor o igual a 12 años.' });
+                return res.status(400).json({ error: 'La edad debe ser mayor o igual a 12 años.' });      // contol de restricción CHECK (Edad menor a 12)
             }
 
             return res.status(500).json({ error: 'Error interno al guardar en la base de datos.' });
         }
-
-        // Responde confirmando la inserción e indicando el ID generado
         res.status(201).json({ 
             mensaje: 'Usuario registrado exitosamente.', 
-            id: this.lastID 
+            id: this.lastID   // Responde confirmando la inserción exitosa y devolviendo el ID generado
         });
     });
 });
 
 // Iniciar servidor
 app.listen(PORT, () => {
-    console.log(`Servidor escuchando en http://localhost:${PORT}`);
+    console.log(`Servidor activo en http://localhost:${PORT}`);
 });
 
-4. Paso a Paso: Implementación del Frontend (public/index.html)
+4. Implementación del Frontend (public/index.html)
 Crea la carpeta public y guarda dentro el archivo index.html. Incluye el formulario para enviar datos mediante JavaScript (fetch) y una tabla para visualizar los registros sin necesidad de recargar la página:
 <!DOCTYPE html>
 <html lang="es">
