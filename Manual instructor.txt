@@ -1,13 +1,18 @@
 Manual instructor
-lo que se necesitas es :
-Node.js, Express, SQLite3, HTML5 y JavaScript (Fetch API)
-Proyecto: Gestión de Datos mediante Formulario Web
-1. Introducción y Arquitectura del Sistema
+1. lo que se necesitas saber es :
+Node.js, Express, SQLite3, HTML5, JavaScript (Fetch API) y npm 
 
-  [ CLIENTE / BROWSER ]
-   1.registrar (Envía datos del formulario)----> 2.[ SERVIDOR NODE.JS ]---> 3.[ BASE DE DATOS ]
-   3. Muestra tabla actualizada                        (Express.js)      (SQLite: base_de_datos.db)
-   
+Node.js: El entorno que permite ejecutar código JavaScript en la computadora o servidor (fuera del navegador).
+
+Express: El marco de trabajo (framework) que facilita la creación del servidor web y la gestión de rutas (/usuarios, /registrar).
+
+SQLite3: La base de datos ligera que guarda los registros de forma permanente en un archivo local.
+
+HTML5: Construye la estructura visual de la página web (el formulario y la tabla).
+
+JavaScript (Fetch API): Es el mensajero que permite que la página web hable con el servidor en segundo plano sin recargar la pantalla.
+
+npm: El gestor de paquetes que viene con Node.js y te permite descargar librerías o herramientas de terceros (como Express y SQLite3) con un simple comando (npm install).
 
 2. Estructura del Proyecto
 Crea una carpeta para tu proyecto y organiza los archivos de la siguiente manera:
