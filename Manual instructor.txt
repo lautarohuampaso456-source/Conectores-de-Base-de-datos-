@@ -1,8 +1,10 @@
 Manual instructor
 1. lo que se necesitas saber es :
-Node.js, Express, SQLite3, HTML5, JavaScript (Fetch API) y npm 
+Node.js, Express, SQLite3, HTML5, Conector, JavaScript y npm 
 
 Node.js: El entorno que permite ejecutar código JavaScript en la computadora o servidor (fuera del navegador).
+
+conector: Un conector de base de datos es un paquete de codigo que actúa como paquete traductor entre tu servidor y la base de datos.
 
 Express: El marco de trabajo (framework) que facilita la creación del servidor web y la gestión de rutas (/usuarios, /registrar).
 
@@ -278,6 +280,4 @@ Crea la carpeta public y guarda dentro el archivo index.html. Incluye el formula
    npm start o node server.js
 
  * Abre tu navegador web e ingresa a: http://localhost:3000
-Prueba de Funcionamiento:
- * Agregar registros: Completa los campos en el formulario y pulsa Guardar Registro. La petición POST mandará los datos a Express, SQLite ejecutará el INSERT INTO y la tabla en pantalla se actualizará instantáneamente.
- * Extraer registros: Al cargar la página o agregar un registro nuevo, la función JavaScript ejecuta un fetch('/usuarios'), solicitando un SELECT * FROM usuarios al servidor y dibujando cada fila en la tabla HTML.
+ 
