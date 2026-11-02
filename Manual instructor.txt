@@ -12,7 +12,7 @@ SQLite3: La base de datos ligera que guarda los registros de forma permanente en
 
 HTML5: Construye la estructura visual de la página web (el formulario y la tabla).
 
-JavaScript (Fetch API): Es el mensajero que permite que la página web hable con el servidor en segundo plano sin recargar la pantalla.
+JavaScript: Es el mensajero que permite que la página web hable con el servidor en segundo plano sin recargar la pantalla.
 
 npm: El gestor de paquetes que viene con Node.js y te permite descargar librerías o herramientas de terceros (como Express y SQLite3) con un simple comando (npm install).
 
