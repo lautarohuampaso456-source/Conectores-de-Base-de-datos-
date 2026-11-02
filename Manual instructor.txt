@@ -6,7 +6,7 @@ Node.js: El entorno que permite ejecutar código JavaScript en la computadora o 
 
 conector: Un conector de base de datos es un paquete de codigo que actúa como paquete traductor entre tu servidor y la base de datos.
 
-Express: El marco de trabajo (framework) que facilita la creación del servidor web y la gestión de rutas (/usuarios, /registrar).
+Express: El marco de trabajo que facilita la creación del servidor web y la gestión de rutas (/usuarios, /registrar).
 
 SQLite3: La base de datos ligera que guarda los registros de forma permanente en un archivo local.
 
